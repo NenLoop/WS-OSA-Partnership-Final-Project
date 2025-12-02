@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import Login from './Login';
-import Signup from './Signup';
-import Home from './Home';
-import './App.css';
+import Login from '.pages/Login';
+import Register from '.pages/Register';
+import LandingPage from '.pages/LandingPage';
+import '.styles/App.css';
 
 function App() {
   // Simple state-based routing for demonstration

@@ -76,4 +76,4 @@ const Signup = ({ onNavigate }) => {
   );
 };
 
-export default Signup;
+export default Register;

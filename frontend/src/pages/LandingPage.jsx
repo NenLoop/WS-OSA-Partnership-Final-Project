@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search, User, ChevronRight, ChevronLeft } from 'lucide-react';
-import './App.css';
+import '../styles/App.css';
 
 const Home = ({ onNavigate }) => {
   const departments = [
