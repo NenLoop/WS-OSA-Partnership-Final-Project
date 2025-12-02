@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'accounts',
-    'api',
+    
 ]
 
 MIDDLEWARE = [
@@ -105,7 +105,7 @@ DATABASES = {
     }
 }
 
-AUTH_USER_MODEL = 'accounts.CustomUser'
+AUTH_USER_MODEL = 'accounts.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
