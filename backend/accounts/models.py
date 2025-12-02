@@ -56,6 +56,13 @@ class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Each user can have one department
+    department = models.OneToOneField("partnerships.Department", on_delete=models.SET_NULL, null=True, blank=True, related_name='user')
+    
+    def can_create_department(self):
+        """Only staff users not linked to a department can create one."""
+        return self.is_staff and self.department is None
+
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
