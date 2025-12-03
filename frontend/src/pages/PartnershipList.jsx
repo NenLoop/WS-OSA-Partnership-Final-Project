@@ -1,5 +1,118 @@
-export default function PartnershipList(){
-    return(
-        <></>
-    )
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api";
+
+export default function PartnershipList() {
+  const [partnerships, setPartnerships] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    loadDepartments();
+    loadPartnerships();
+  }, []);
+
+  const loadDepartments = () => {
+    api
+      .get("/api/department/")
+      .then((res) => setDepartments(res.data))
+      .catch(() => alert("Failed to load departments"));
+  };
+
+  const loadPartnerships = () => {
+    api
+      .get("/api/partnership/")
+      .then((res) => setPartnerships(res.data))
+      .catch(() => alert("Failed to load partnerships"));
+  };
+
+  const getDepartmentName = (deptId) => {
+    const found = departments.find((d) => d.id === deptId);
+    return found ? found.name : "No Department";
+  };
+
+  // Group partnerships by department name
+  const grouped = partnerships.reduce((acc, p) => {
+    const key = getDepartmentName(p.department_id);
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(p);
+    return acc;
+  }, {});
+
+  return (
+    <div style={{ padding: 24 }}>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <h2 style={{ color: "white" }}>Partnerships</h2>
+
+        <button
+          onClick={() => navigate("/partnerships-create")}
+          style={{
+            background: "#4CAF50",
+            padding: "10px 16px",
+            color: "#fff",
+            border: "none",
+            borderRadius: 8,
+            cursor: "pointer",
+            fontWeight: 600,
+          }}
+        >
+          + Create
+        </button>
+      </div>
+
+      {Object.entries(grouped).map(([dept, partners]) => (
+        <div key={dept} style={{ marginBottom: 40 }}>
+          <h3 style={{ color: "#bbb", letterSpacing: 1 }}>{dept}</h3>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 24 }}>
+            {partners.map((p) => (
+              <div
+                key={p.id}
+                onClick={() => navigate(`/partnerships/${p.id}`)}
+                style={{
+                  background: "#232326",
+                  borderRadius: 16,
+                  boxShadow: "0 2px 12px #0004",
+                  padding: "16px 24px",
+                  minWidth: 320,
+                  display: "flex",
+                  alignItems: "center",
+                  cursor: "pointer",
+                }}
+              >
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ color: "#fff", marginBottom: 6 }}>
+                    {p.business_name}
+                  </h4>
+
+                  <div style={{ color: "#ccc" }}>
+                    Contact: {p.contact_person}
+                  </div>
+
+                  <div style={{ color: "#999", fontSize: 13 }}>
+                    {p.address}
+                  </div>
+                </div>
+
+                {p.logo && (
+                  <img
+                    src={p.logo}
+                    alt={p.business_name}
+                    style={{
+                      height: 56,
+                      width: 56,
+                      marginLeft: 16,
+                      borderRadius: 8,
+                      objectFit: "contain",
+                      background: "#fff",
+                    }}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }

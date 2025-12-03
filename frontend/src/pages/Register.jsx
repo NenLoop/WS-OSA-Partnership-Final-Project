@@ -95,7 +95,7 @@ const Register = () => {
           </span>}
 
           <div style={{textAlign:'center', marginTop:'20px'}}>
-          <button className="btn btn-outline" onClick={() => navigate('login')}>
+          <button className="btn btn-outline" onClick={() => navigate('/login')}>
             Back to Login
           </button>
         </div>

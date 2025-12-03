@@ -1,8 +1,11 @@
 import React from 'react';
 import { Search, User, ChevronRight, ChevronLeft } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 import '../styles/App.css';
 
-const Home = ({ onNavigate }) => {
+const Home = () => {
+  const navigate = useNavigate();
+
   const departments = [
     { code: 'CCJE', color: '#0056b3' },
     { code: 'CHM', color: '#ffc107' },
@@ -29,7 +32,7 @@ const Home = ({ onNavigate }) => {
             <Search size={14} color="#333"/>
             <input type="text" placeholder="Search..." style={{border:'none', outline:'none', marginLeft:'5px', width:'80px'}} />
           </div>
-          <a href="#" onClick={() => onNavigate('login')} style={{color:'#ff6b6b'}}>Logout</a>
+          <a href="#" onClick={() => navigate('login')} style={{color:'#ff6b6b'}}>Login</a>
         </div>
       </nav>
 

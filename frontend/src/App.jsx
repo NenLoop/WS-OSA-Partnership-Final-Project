@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import LandingPage from './pages/LandingPage';
 import PartnershipList from './pages/PartnershipList';
 import PartnershipDetail from './pages/PartnershipDetail';
+import PartnershipCreate from './pages/PartnershipCreate';
 import ProtectedRoute from './components/ProtectedRoute';
 import './styles/App.css';
 
@@ -31,9 +32,19 @@ function App() {
         <Route path="/register" element={<RegisterAndLogout />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/partnerships" element={
-         // <ProtectedRoute>
+          <ProtectedRoute>
             <PartnershipList />
-         /// </ProtectedRoute>
+          </ProtectedRoute>
+        } />
+        <Route path="/partnerships/:id" element={
+          <ProtectedRoute>
+            <PartnershipDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="/partnerships-create/" element={
+          <ProtectedRoute>
+            <PartnershipCreate />
+          </ProtectedRoute>
         } />
       </Routes>
     </BrowserRouter>

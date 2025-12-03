@@ -77,7 +77,7 @@ const Login = () => {
           Don't have an account? 
           <span 
             style={{color:'white', fontWeight:'bold', cursor:'pointer', marginLeft:'5px'}}
-            onClick={() => navigate('signup')}
+            onClick={() => navigate('/register')}
           >
             Register
           </span>
