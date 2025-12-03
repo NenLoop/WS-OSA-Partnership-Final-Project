@@ -2,18 +2,19 @@ from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import User
-
+from partnerships.models import Department
+from partnerships.serializers import DepartmentSerializer
 
 class UserSerializer(serializers.ModelSerializer):
     """
     User serializer for authenticated user's own profile management.
     Allows write access to non-sensitive fields, but read operations only return ID.
     """
+    department = DepartmentSerializer(read_only=True)
     class Meta:
         model = User
-        fields = ['id', 'email', 'first_name', 'last_name', 
-                  'business_name', 'address', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        fields = ['id', 'email', 'first_name', 'last_name', 'department', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'department']
     
     def to_representation(self, instance):
         """Override to only return user ID in read operations"""
@@ -28,8 +29,7 @@ class FullUserProfileSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = User
-        fields = ['id', 'email', 'first_name', 'last_name', 
-                  'business_name', 'address', 'created_at', 'updated_at']
+        fields = ['id', 'email', 'first_name', 'last_name', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
 
@@ -47,8 +47,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'password', 'password2', 
-                  'first_name', 'last_name', 'business_name', 'address']
+        fields = ['email', 'password', 'password2', 'first_name', 'last_name']
         extra_kwargs = {
             'email': {'required': True},
         }
@@ -70,8 +69,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             password=password,
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', ''),
-            business_name=validated_data.get('business_name', ''),
-            address=validated_data.get('address', ''),
             is_staff=False,
             is_superuser=False,
             is_active=True,
@@ -82,7 +79,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     """Custom serializer to use email instead of username for login"""
     username_field = 'email'
-    
+
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)

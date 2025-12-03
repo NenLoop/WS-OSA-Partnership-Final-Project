@@ -9,12 +9,12 @@ from .serializers import DepartmentSerializer, PartnershipSerializer, Partnershi
 class DepartmentViewSet(viewsets.ModelViewSet):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
 class PartnershipViewSet(viewsets.ModelViewSet):
     queryset = Partnership.objects.all()
     serializer_class = PartnershipSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny] # IsAuthenticated
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['location_type']
     search_fields = ['business_name']
