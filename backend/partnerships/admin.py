@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import Department, Partnership, PartnershipInstance
 
-# Register your models here.
+admin.site.register(Department)
+admin.site.register(Partnership)
+admin.site.register(PartnershipInstance)
