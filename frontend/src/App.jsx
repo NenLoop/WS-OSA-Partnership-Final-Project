@@ -1,31 +1,42 @@
 import React, { useState } from 'react';
-import Login from '.pages/Login';
-import Register from '.pages/Register';
-import LandingPage from '.pages/LandingPage';
-import '.styles/App.css';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './pages/Login.jsx';
+import Register from './pages/Register';
+import LandingPage from './pages/LandingPage';
+import PartnershipList from './pages/PartnershipList';
+import PartnershipDetail from './pages/PartnershipDetail';
+import ProtectedRoute from './components/ProtectedRoute';
+import './styles/App.css';
+
+function Logout() {
+  localStorage.clear()
+  return <Navigate to="/Landing Page" />
+}
+
+function RegisterAndLogout() {
+  localStorage.clear()
+  return <Register/>
+}
 
 function App() {
   // Simple state-based routing for demonstration
   // In a real app, you would use 'react-router-dom'
-  const [currentScreen, setCurrentScreen] = useState('login');
 
-  const renderScreen = () => {
-    switch (currentScreen) {
-      case 'login':
-        return <Login onNavigate={setCurrentScreen} />;
-      case 'signup':
-        return <Signup onNavigate={setCurrentScreen} />;
-      case 'home':
-        return <Home onNavigate={setCurrentScreen} />;
-      default:
-        return <Login onNavigate={setCurrentScreen} />;
-    }
-  };
-
+  // dear past self we are using 'react-router-dom now' - future you 
   return (
-    <div className="App">
-      {renderScreen()}
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<RegisterAndLogout />} />
+        <Route path="/logout" element={<Logout />} />
+        <Route path="/partnerships" element={
+         // <ProtectedRoute>
+            <PartnershipList />
+         /// </ProtectedRoute>
+        } />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
