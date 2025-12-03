@@ -3,6 +3,8 @@ from .models import Partnership, PartnershipInstance, Department
 from django.contrib.auth import get_user_model
 
 class DepartmentSerializer(serializers.ModelSerializer):
+    logo = serializers.ImageField(required=False, allow_null=True, use_url=True)
+
     class Meta:
         model = Department
         fields = ['id', 'name', 'logo', 'status', 'created_at']
@@ -38,6 +40,7 @@ class PartnershipInstanceSerializer(serializers.ModelSerializer):
         ]
 
 class PartnershipSerializer(serializers.ModelSerializer):
+    logo = serializers.ImageField(required=False, allow_null=True, use_url=True)
     instances = PartnershipInstanceSerializer(many=True, read_only=True)
 
     class Meta:
@@ -46,6 +49,7 @@ class PartnershipSerializer(serializers.ModelSerializer):
             'id',
             'department_id',
             'business_name',
+            'logo',
             'description',
             'address',
             'contact_person',

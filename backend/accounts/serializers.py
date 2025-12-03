@@ -14,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name', 'last_name', 'department', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'created_at', 'updated_at', 'department']
+        read_only_fields = ['id', 'created_at', 'updated_at']
     
     def to_representation(self, instance):
         """Override to only return user ID in read operations"""

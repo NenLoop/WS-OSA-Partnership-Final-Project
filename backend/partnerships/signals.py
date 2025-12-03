@@ -24,6 +24,7 @@ def create_or_update_partnership_notification(sender, instance, created, **kwarg
 def delete_partnership_notification(sender, instance, **kwargs):
     Notification.objects.create(
         sender_id=instance.department_id,
-        partnership_id=instance,
+        # The partnership instance is already deleted, so we cannot link to it.
+        # The message itself contains the necessary information.
         message=make_message(instance, 'deleted'),
     )

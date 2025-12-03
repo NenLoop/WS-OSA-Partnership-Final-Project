@@ -8,7 +8,7 @@ NOTIFICATION_STATUS = (
 
 class Notification(models.Model):
     sender_id = models.ForeignKey(Department, on_delete=models.RESTRICT, null=True)
-    partnership_id = models.ForeignKey(Partnership, on_delete=models.RESTRICT, null=True)
+    partnership_id = models.ForeignKey(Partnership, on_delete=models.CASCADE, null=True)
     message = models.TextField()
 
     status = models.CharField(

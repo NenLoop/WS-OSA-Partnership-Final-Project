@@ -2,7 +2,7 @@ from django.db import models
 
 class Department(models.Model):
     name = models.CharField(max_length=100)
-    logo = models.ImageField(upload_to='department-logo/')
+    logo = models.ImageField(upload_to='department-logo/', null=True, blank=True)
 
     DEPT_STATUS = (
         ('a', 'Active'),
@@ -23,11 +23,12 @@ class Department(models.Model):
         ordering = ['created_at']
 
     def __str__(self):
-        return self.department_name
+        return self.name
 
 class Partnership(models.Model):
-    department_id = models.OneToOneField(Department, on_delete=models.RESTRICT, null=True)
+    department_id = models.ForeignKey(Department, on_delete=models.RESTRICT, null=True, related_name='partnerships')
     business_name = models.CharField(max_length=150)
+    logo = models.ImageField(upload_to='partnership-logo/', null=True, blank=True)
     description = models.TextField()
     address = models.CharField(max_length=200)
     contact_person = models.CharField(max_length=100)
