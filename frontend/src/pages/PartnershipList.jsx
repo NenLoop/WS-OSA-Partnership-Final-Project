@@ -39,25 +39,48 @@ export default function PartnershipList() {
     return acc;
   }, {});
 
+  const handleLogout = () => {
+    if (window.confirm("Are you sure you want to logout?")) {
+      navigate("/logout");
+    }
+  };
+
   return (
-    <div style={{ padding: 24 }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+    <div style={{ padding: 24, background: "#000", minHeight: "100vh" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <h2 style={{ color: "white" }}>Partnerships</h2>
 
-        <button
-          onClick={() => navigate("/partnerships-create")}
-          style={{
-            background: "#4CAF50",
-            padding: "10px 16px",
-            color: "#fff",
-            border: "none",
-            borderRadius: 8,
-            cursor: "pointer",
-            fontWeight: 600,
-          }}
-        >
-          + Create
-        </button>
+        <div style={{ display: "flex", gap: 12 }}>
+          <button
+            onClick={() => navigate("/partnerships-create")}
+            style={{
+              background: "#4CAF50",
+              padding: "10px 16px",
+              color: "#fff",
+              border: "none",
+              borderRadius: 8,
+              cursor: "pointer",
+              fontWeight: 600,
+            }}
+          >
+            + Create
+          </button>
+
+          <button
+            onClick={handleLogout}
+            style={{
+              background: "#e74c3c",
+              padding: "10px 16px",
+              color: "#fff",
+              border: "none",
+              borderRadius: 8,
+              cursor: "pointer",
+              fontWeight: 600,
+            }}
+          >
+            Logout
+          </button>
+        </div>
       </div>
 
       {Object.entries(grouped).map(([dept, partners]) => (
@@ -81,17 +104,9 @@ export default function PartnershipList() {
                 }}
               >
                 <div style={{ flex: 1 }}>
-                  <h4 style={{ color: "#fff", marginBottom: 6 }}>
-                    {p.business_name}
-                  </h4>
-
-                  <div style={{ color: "#ccc" }}>
-                    Contact: {p.contact_person}
-                  </div>
-
-                  <div style={{ color: "#999", fontSize: 13 }}>
-                    {p.address}
-                  </div>
+                  <h4 style={{ color: "#fff", marginBottom: 6 }}>{p.business_name}</h4>
+                  <div style={{ color: "#ccc" }}>Contact: {p.contact_person}</div>
+                  <div style={{ color: "#999", fontSize: 13 }}>{p.address}</div>
                 </div>
 
                 {p.logo && (

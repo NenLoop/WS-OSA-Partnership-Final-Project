@@ -11,7 +11,7 @@ import './styles/App.css';
 
 function Logout() {
   localStorage.clear()
-  return <Navigate to="/Landing Page" />
+  return <Navigate to="/" />
 }
 
 function RegisterAndLogout() {
