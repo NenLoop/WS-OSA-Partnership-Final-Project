@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 
 class DepartmentSerializer(serializers.ModelSerializer):
     logo = serializers.ImageField(required=False, allow_null=True, use_url=True)
-
     class Meta:
         model = Department
         fields = ['id', 'name', 'logo', 'status', 'created_at']

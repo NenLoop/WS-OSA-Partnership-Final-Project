@@ -23,10 +23,10 @@ class Department(models.Model):
         ordering = ['created_at']
 
     def __str__(self):
-        return self.name
+        return self.department_name
 
 class Partnership(models.Model):
-    department_id = models.ForeignKey(Department, on_delete=models.RESTRICT, null=True, related_name='partnerships')
+    department_id = models.OneToOneField(Department, on_delete=models.RESTRICT, null=True)
     business_name = models.CharField(max_length=150)
     logo = models.ImageField(upload_to='partnership-logo/', null=True, blank=True)
     description = models.TextField()
