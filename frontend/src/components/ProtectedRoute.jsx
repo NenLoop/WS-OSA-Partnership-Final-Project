@@ -4,8 +4,9 @@ import {REFRESH_TOKEN, ACCESS_TOKEN} from "../constants.js";
 import api from "../api.js";
 import { useState, useEffect } from "react";
 
-function ProtectedRoutes({children}) {
+function ProtectedRoutes({children, allowedRoles = []}) {
     const [isAuthorized, setIsAuthorized] = useState(null);
+    const [userRole, setUserRole] = useState(null);
 
     useEffect(() => {
         auth().catch(() => setIsAuthorized(false))
@@ -42,12 +43,22 @@ function ProtectedRoutes({children}) {
         if (tokenExpiration < now) {
             await refreshToken();
         } else {
+            setUserRole({
+                is_superuser: decoded.is_superuser,
+                is_staff: decoded.is_staff,
+                department: decoded.department,
+            });
             setIsAuthorized(true);
         }
     };
 
     if (isAuthorized === null) {
         return <div>Loading...</div>;
+    }
+
+    if (allowedRoles.length > 0) {
+        const hasAccess = allowedRoles.some(role => userRole?.[role]);
+        if (!hasAccess) return <Navigate to="/" replace />;
     }
 
     return isAuthorized ? children : <Navigate to="/login" />;

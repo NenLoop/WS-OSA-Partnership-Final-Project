@@ -43,6 +43,7 @@ const Home = () => {
           <p style={{maxWidth:'700px', margin:'0 auto', lineHeight:'1.6'}}>
             Dedicated to forming innovators who are academically excellent, socially responsible, and rounded in faith.
           </p>
+          <h1 className="text-green-600 text-3xl font-bold">Tailwind working 🎉</h1>
         </div>
       </section>
 

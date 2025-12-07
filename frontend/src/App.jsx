@@ -7,6 +7,7 @@ import PartnershipList from './pages/PartnershipList';
 import PartnershipDetail from './pages/PartnershipDetail';
 import PartnershipCreate from './pages/PartnershipCreate';
 import ProtectedRoute from './components/ProtectedRoute';
+import Admin from './layouts/AdminLayout.jsx';
 import './styles/App.css';
 
 function Logout() {
@@ -29,6 +30,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="/register" element={<RegisterAndLogout />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/partnerships" element={
