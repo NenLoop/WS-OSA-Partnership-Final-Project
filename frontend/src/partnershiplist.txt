@@ -46,7 +46,7 @@ export default function PartnershipList() {
   };
 
   return (
-    <div style={{ padding: 24, background: "#000", minHeight: "100vh" }}>
+    <div style={{ padding: 24, marginLeft: "auto", background: "#000", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <h2 style={{ color: "white" }}>Partnerships</h2>
 

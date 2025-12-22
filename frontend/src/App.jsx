@@ -1,55 +1,94 @@
-import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login.jsx';
-import Register from './pages/Register';
-import LandingPage from './pages/LandingPage';
-import PartnershipList from './pages/PartnershipList';
-import PartnershipDetail from './pages/PartnershipDetail';
-import PartnershipCreate from './pages/PartnershipCreate';
-import ProtectedRoute from './components/ProtectedRoute';
-import Admin from './layouts/AdminLayout.jsx';
-import './styles/App.css';
-
-function Logout() {
-  localStorage.clear()
-  return <Navigate to="/" />
-}
-
-function RegisterAndLogout() {
-  localStorage.clear()
-  return <Register/>
-}
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthProvider";
+import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Departments from "./pages/Departments";
+import Partnerships from "./pages/Partnerships";
+import Users from "./pages/Users";
+import Requests from "./pages/Requests";
+import Notifications from "./pages/Notifications";
 
 function App() {
-  // Simple state-based routing for demonstration
-  // In a real app, you would use 'react-router-dom'
+  const { isAuthenticated, loading, isAdmin } = useAuth();
 
-  // dear past self we are using 'react-router-dom now' - future you 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/register" element={<RegisterAndLogout />} />
-        <Route path="/logout" element={<Logout />} />
-        <Route path="/partnerships" element={
+    <Routes>
+      <Route
+        path="/login"
+        element={
+          isAuthenticated ? (
+            <Navigate to={isAdmin ? "/dashboard" : "/partnerships"} />
+          ) : (
+            <Login />
+          )
+        }
+      />
+
+      <Route
+        path="/"
+        element={
           <ProtectedRoute>
-            <PartnershipList />
+            <Layout />
           </ProtectedRoute>
-        } />
-        <Route path="/partnerships/:id" element={
-          <ProtectedRoute>
-            <PartnershipDetail />
-          </ProtectedRoute>
-        } />
-        <Route path="/partnerships-create/" element={
-          <ProtectedRoute>
-            <PartnershipCreate />
-          </ProtectedRoute>
-        } />
-      </Routes>
-    </BrowserRouter>
+        }
+      >
+        <Route
+          index
+          element={<Navigate to={isAdmin ? "/dashboard" : "/partnerships"} />}
+        />
+
+        <Route
+          path="dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="users"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Users />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="departments" element={<Departments />} />
+        <Route path="partnerships" element={<Partnerships />} />
+
+        <Route
+          path="requests"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "staff"]}>
+              <Requests />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="notifications"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Notifications />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
   );
 }
 
