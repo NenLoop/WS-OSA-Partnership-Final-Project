@@ -8,6 +8,7 @@ import '../styles/App.css';
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [rememberMe, setRememberMe] = useState(false);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -24,63 +25,68 @@ const Login = () => {
             alert(error.response?.data || error.message)
         } finally {
             setLoading(false)
-            console.log("Login attempt finished");
         }
     };
+
   return (
-    <div className="auth-wrapper">
-        <div className="auth-logo">
-        <img src="/hcdc-logo.png" alt="Holy Cross of Davao College Logo" style={{ height: '150px', marginBottom: '10px' }} />
-        </div>
-      <div className="auth-card">
+    <div className="auth-wrapper-new">
+      <div className="auth-header">
+        <img src="/hcdc-logo.png" alt="Holy Cross Logo" className="auth-header-logo" />
+        <h1 className="auth-header-title">HOLY CROSS OF<br/>DAVAO COLLEGE</h1>
+      </div>
 
-        <div className="auth-title-wrapped">
-          LOGIN
-        </div>
+      <div className="auth-card-new">
+        <h2 className="auth-card-title">LOGIN</h2>
 
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <label>Email Address</label>
-            <input type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email..." />
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-field">
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              required
+            />
           </div>
 
-          <div className="input-group">
+          <div className="form-field">
             <label>Password</label>
-            <input type="password" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password..." />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+            />
           </div>
 
-          <div style={{display:'flex', justifyContent:'space-between', fontSize:'0.85rem', marginBottom:'25px', color:'#aaa'}}>
-            <label style={{display:'flex', alignItems:'center', gap:'5px'}}>
-              <input type="checkbox" /> Remember me
+          <div className="form-options">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              <span>Remember Me</span>
             </label>
-            <span style={{cursor:'pointer', color:'white'}}>Forgot Password?</span>
+            <a href="#" className="forgot-password">Forgot Password?</a>
           </div>
 
-          <button type="submit" className="btn btn-primary">
-            Log In
+          <button type="submit" className="btn-submit" disabled={loading}>
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-        {loading && <span 
-            style={{color:'white', fontWeight:'bold', cursor:'pointer', marginLeft:'5px'}}
-            onClick={() => navigate('signup')}
-          >
-            Loading...
-          </span>}
 
-        <div style={{textAlign:'center', marginTop:'20px', fontSize:'0.9rem', color:'#aaa'}}>
-          Don't have an account? 
-          <span 
-            style={{color:'white', fontWeight:'bold', cursor:'pointer', marginLeft:'5px'}}
+        <div className="auth-footer">
+          Don't have an account?
+          <button
+            type="button"
+            className="link-button"
             onClick={() => navigate('/register')}
           >
             Register
-          </span>
+          </button>
         </div>
       </div>
     </div>
