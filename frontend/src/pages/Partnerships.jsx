@@ -21,6 +21,7 @@ export default function Partnerships() {
   const deleteMutation = useDeletePartnership();
   const createRequestMutation = useCreateRequest();
 
+  const [selectedDept, setSelectedDept] = useState("All");
   const [modalOpen, setModalOpen] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [requestModalOpen, setRequestModalOpen] = useState(false);
@@ -62,7 +63,7 @@ export default function Partnerships() {
       contact_number: "",
       started_date: "",
       effectivity_date: "",
-      status: "pending",
+      status: "active",
       partnership_type: "local",
       logo: null,
     });
@@ -81,8 +82,8 @@ export default function Partnerships() {
       contact_number: partnership.contact_number || "",
       started_date: partnership.started_date || "",
       effectivity_date: partnership.effectivity_date || "",
-      status: partnership.status || "pending",
-      partnership_type: partnership.partnership_type || "local",
+      status: partnership.status || "",
+      partnership_type: partnership.partnership_type || "",
       logo: null,
     });
     setModalOpen(true);
@@ -157,6 +158,13 @@ export default function Partnerships() {
     return acc;
   }, {});
 
+  const departmentNames = ["All", ...Object.keys(groupedPartnerships || {})];
+
+  const visiblePartnerships =
+    selectedDept === "All"
+      ? partnerships
+      : groupedPartnerships?.[selectedDept] || [];
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -183,225 +191,233 @@ export default function Partnerships() {
         </div>
       </div>
 
-      {Object.entries(groupedPartnerships || {}).map(
-        ([deptName, deptPartnerships]) => (
-          <div key={deptName} className="mb-6">
-            <h2 className="text-xl font-extrabold mb-3 text-blue-800 tracking-wide uppercase drop-shadow-lg">
-              {deptName}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {deptPartnerships.map((partnership) => {
-                // --- DERIVED FIELDS ---
-                const now = new Date();
-                const started = partnership.started_date
-                  ? new Date(partnership.started_date)
-                  : null;
-                const effectivity = partnership.effectivity_date
-                  ? new Date(partnership.effectivity_date)
-                  : null;
-                let status = "Active";
-                let statusColor = "bg-green-500";
-                let borderColor = "border-green-400";
-                if (partnership.status) {
-                  // Prefer explicit status from backend
-                  if (partnership.status === "pending") {
-                    status = "PENDING";
-                    statusColor = "bg-blue-500";
-                    borderColor = "border-blue-400";
-                  } else if (
-                    partnership.status === "for_removal" ||
-                    partnership.status === "for removal"
-                  ) {
-                    status = "For Removal";
-                    statusColor = "bg-orange-500";
-                    borderColor = "border-orange-400";
-                  } else if (partnership.status === "active") {
-                    status = "Active";
-                    statusColor = "bg-green-500";
-                    borderColor = "border-green-400";
-                  }
-                } else if (effectivity && effectivity > now) {
-                  status = "PENDING";
-                  statusColor = "bg-blue-500";
-                  borderColor = "border-blue-400";
-                }
-                // Logotype or initials (circle)
-                let logoEl = null;
-                if (partnership.logo) {
-                  // Media URL proxied by vite.config.js
-                  console.log(partnership.logo);
-                  logoEl = (
-                    <img
-                      src={`${partnership.logo}`}
-                      alt={partnership.business_name}
-                      className="w-12 h-12 rounded-full border-2 border-slate-300 bg-white object-cover"
-                    />
-                  );
-                } else {
-                  const initial = partnership.business_name
-                    ? partnership.business_name
-                        .split(" ")
-                        .map((w) => w[0] || "")
-                        .join("")
-                        .substring(0, 2)
-                        .toUpperCase()
-                    : "?";
-                  logoEl = (
-                    <div className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-slate-300 bg-blue-200 text-xl font-bold text-blue-900 drop-shadow-sm">
-                      {initial}
-                    </div>
-                  );
-                }
-                // Meta fields
-                const sinceYear = started ? started.getFullYear() : "—";
-                const location = partnership.address || "N/A";
-                // Card rendering
-                return (
-                  <div
-                    key={partnership.id}
-                    className={`relative bg-white rounded-xl shadow p-5 border-l-8 ${borderColor} flex flex-col min-h-[200px] group transition hover:shadow-xl`}
+      <div className="flex gap-3 mb-8 overflow-x-auto">
+        {departmentNames.map((dept) => (
+          <button
+            key={dept}
+            onClick={() => setSelectedDept(dept)}
+            className={`px-5 py-2 rounded-full text-sm font-semibold transition
+        ${
+          selectedDept === dept
+            ? "bg-blue-600 text-white shadow"
+            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+        }`}
+          >
+            {dept}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {visiblePartnerships.length === 0 ? (
+          <p className="col-span-full text-center py-10 text-slate-500">
+            No partnerships found
+          </p>
+        ) : (
+          visiblePartnerships.map((partnership) => {
+            const now = new Date();
+            const started = partnership.started_date
+              ? new Date(partnership.started_date)
+              : null;
+            const effectivity = partnership.effectivity_date
+              ? new Date(partnership.effectivity_date)
+              : null;
+            let status, statusColor, borderColor;
+
+            if (partnership.status) {
+              switch (partnership.status) {
+                case "active":
+                  status = "Active";
+                  statusColor = "bg-green-500";
+                  borderColor = "border-green-400";
+                  break;
+                case "renewal":
+                  status = "For Renewal";
+                  statusColor = "bg-yellow-500";
+                  borderColor = "border-yellow-400";
+                  break;
+                case "terminated":
+                  status = "Terminated";
+                  statusColor = "bg-red-500";
+                  borderColor = "border-red-400";
+                  break;
+                case "expired":
+                  status = "Expired";
+                  statusColor = "bg-gray-500";
+                  borderColor = "border-gray-400";
+                  break;
+                default:
+                  status = "Unknown";
+                  statusColor = "bg-gray-400";
+                  borderColor = "border-gray-300";
+              }
+            } else {
+              // Fallback if status is somehow null/undefined
+              status = "Active";
+              statusColor = "bg-green-500";
+              borderColor = "border-green-400";
+            }
+            // Logotype or initials (circle)
+            let logoEl = null;
+            if (partnership.logo) {
+              // Media URL proxied by vite.config.js
+              logoEl = (
+                <img
+                  src={`${partnership.logo}`}
+                  alt={partnership.business_name}
+                  className="w-12 h-12 rounded-full border-2 border-slate-300 bg-white object-cover"
+                />
+              );
+            } else {
+              const initial = partnership.business_name
+                ? partnership.business_name
+                    .split(" ")
+                    .map((w) => w[0] || "")
+                    .join("")
+                    .substring(0, 2)
+                    .toUpperCase()
+                : "?";
+              logoEl = (
+                <div className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-slate-300 bg-blue-200 text-xl font-bold text-blue-900 drop-shadow-sm">
+                  {initial}
+                </div>
+              );
+            }
+            // Meta fields
+            const sinceYear = started ? started.getFullYear() : "—";
+            const location = partnership.address || "N/A";
+            // Card rendering
+
+            return (
+              <div
+                key={partnership.id}
+                className={`relative bg-white rounded-xl shadow p-5 border-l-8 ${borderColor}
+            flex flex-col min-h-[200px] transition hover:shadow-xl`}
+              >
+                {(isAdmin ||
+                  (isStaff && user.department === partnership.department)) && (
+                  <span
+                    className={`absolute top-5 right-5 flex items-center`}
+                    title={status}
                   >
-                    {/* Status Dot (Visible only to admin or staff of department) */}
-                    {(isAdmin ||
-                      (isStaff &&
-                        user.department === partnership.department)) && (
-                      <span
-                        className={`absolute top-5 right-5 flex items-center`}
-                        title={status}
+                    <span
+                      className={statusColor}
+                      style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: "9999px",
+                        display: "inline-block",
+                        marginRight: 4,
+                        border: "2px solid white",
+                        boxShadow: "0 0 1px 1px rgba(60,60,60,0.05)",
+                      }}
+                    />
+                    <span className="sr-only">{status}</span>
+                  </span>
+                )}
+                {/* Logo or Initials */}
+                <div className="absolute -left-6 top-4">{logoEl}</div>
+                <div className="pl-10 pt-2 min-h-[48px]">
+                  {/* Business Name */}
+                  <div className="flex items-baseline gap-2">
+                    <h3 className="font-bold text-xl leading-tight">
+                      {partnership.business_name}
+                    </h3>
+                    <span className="text-xs ml-2 px-2 rounded bg-gray-200 text-gray-700">
+                      {partnership.partnership_type === "international"
+                        ? "International"
+                        : "Local"}
+                    </span>
+                  </div>
+                  {/* Description (truncate, hover to show full in tooltip) */}
+                  <div
+                    className="mt-1 text-slate-600 text-sm h-10 overflow-hidden text-ellipsis"
+                    title={partnership.description || ""}
+                  >
+                    {partnership.description || "No description provided."}
+                  </div>
+                </div>
+                <hr className="my-3 border-slate-200" />
+                <div className="flex justify-between text-xs text-slate-500 pb-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block mr-1">
+                      <svg
+                        width="13"
+                        height="13"
+                        fill="none"
+                        viewBox="0 0 24 24"
                       >
-                        <span
-                          className={
-                            status === "PENDING"
-                              ? "bg-blue-500"
-                              : status === "For Removal"
-                              ? "bg-orange-500"
-                              : status === "Active"
-                              ? "bg-green-500"
-                              : "bg-gray-400"
-                          }
-                          style={{
-                            width: 12,
-                            height: 12,
-                            borderRadius: "9999px",
-                            display: "inline-block",
-                            marginRight: 4,
-                            border: "2px solid white",
-                            boxShadow: "0 0 1px 1px rgba(60,60,60,0.05)",
-                          }}
+                        <path
+                          d="M12 2C6.48 2 2 6.484 2 12c0 5.522 4.48 10 10 10s10-4.478 10-10c0-5.516-4.48-10-10-10Zm0 15.625c-1.41 0-2.563-1.042-2.563-2.325 0-1.19.942-2.162 2.181-2.307V8.827a.34.34 0 0 1 .344-.346h.094a.34.34 0 0 1 .344.346v2.166c1.239.145 2.181 1.117 2.181 2.307 0 1.283-1.153 2.325-2.563 2.325Zm0-15.625v.946v-.946Z"
+                          fill="#64748b"
                         />
-                        <span className="sr-only">{status}</span>
-                      </span>
-                    )}
-                    {/* Logo or Initials */}
-                    <div className="absolute -left-6 top-4">{logoEl}</div>
-                    <div className="pl-10 pt-2 min-h-[48px]">
-                      {/* Business Name */}
-                      <div className="flex items-baseline gap-2">
-                        <h3 className="font-bold text-xl leading-tight">
-                          {partnership.business_name}
-                        </h3>
-                        <span className="text-xs ml-2 px-2 rounded bg-gray-200 text-gray-700">
-                          {partnership.partnership_type === "international"
-                            ? "International"
-                            : "Local"}
-                        </span>
-                      </div>
-                      {/* Description (truncate, hover to show full in tooltip) */}
-                      <div
-                        className="mt-1 text-slate-600 text-sm h-10 overflow-hidden text-ellipsis"
-                        title={partnership.description || ""}
-                      >
-                        {partnership.description || "No description provided."}
-                      </div>
-                    </div>
-                    <hr className="my-3 border-slate-200" />
-                    <div className="flex justify-between text-xs text-slate-500 pb-2 flex-wrap">
-                      <div className="flex items-center gap-2">
-                        <span className="inline-block mr-1">
-                          <svg
-                            width="13"
-                            height="13"
-                            fill="none"
-                            viewBox="0 0 24 24"
+                      </svg>
+                    </span>
+                    <span>Since {sinceYear}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block mr-1">
+                      <svg height="13" viewBox="0 0 24 24" width="13">
+                        <path
+                          fill="#64748b"
+                          d="M15.89 14.648a6.503 6.503 0 0 0 3.27-7.448a6.5 6.5 0 0 0-8.21-4.374A6.492 6.492 0 0 0 4.393 13.163c.232 2.755-2.2 4.28-2.453 4.415a1 1 0 0 0 .03 1.75c1.021.485 2.105.698 3.185.623c1.937-.14 5.223-1.012 8.047-3.303c.499.028.997.038 1.495.026a14.713 14.713 0 0 1 1.506-.026c.075.752.162 1.395.162 1.398a1 1 0 0 0 .995.874h.003a1 1 0 0 0 .967-.935a13.905 13.905 0 0 0-1.066-5.282Z"
+                        />
+                      </svg>
+                    </span>
+                    <span>{location}</span>
+                  </div>
+                  {/* Example bottom tag, comment/uncomment as needed */}
+                  {/* <span className="ml-auto bg-orange-200 text-orange-800 px-2 py-1 rounded text-[11px] font-semibold">Ongoing Soon</span> */}
+                </div>
+                {/* Edit/Config Buttons Under Address Right Corner */}
+                <div className="flex justify-end mt-1 pr-1">
+                  {canEdit(partnership) && (
+                    <div className="flex gap-1">
+                      {isAdmin ? (
+                        <>
+                          <button
+                            onClick={() => openEditModal(partnership)}
+                            className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                            title="Edit"
                           >
-                            <path
-                              d="M12 2C6.48 2 2 6.484 2 12c0 5.522 4.48 10 10 10s10-4.478 10-10c0-5.516-4.48-10-10-10Zm0 15.625c-1.41 0-2.563-1.042-2.563-2.325 0-1.19.942-2.162 2.181-2.307V8.827a.34.34 0 0 1 .344-.346h.094a.34.34 0 0 1 .344.346v2.166c1.239.145 2.181 1.117 2.181 2.307 0 1.283-1.153 2.325-2.563 2.325Zm0-15.625v.946v-.946Z"
-                              fill="#64748b"
-                            />
-                          </svg>
-                        </span>
-                        <span>Since {sinceYear}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="inline-block mr-1">
-                          <svg height="13" viewBox="0 0 24 24" width="13">
-                            <path
-                              fill="#64748b"
-                              d="M15.89 14.648a6.503 6.503 0 0 0 3.27-7.448a6.5 6.5 0 0 0-8.21-4.374A6.492 6.492 0 0 0 4.393 13.163c.232 2.755-2.2 4.28-2.453 4.415a1 1 0 0 0 .03 1.75c1.021.485 2.105.698 3.185.623c1.937-.14 5.223-1.012 8.047-3.303c.499.028.997.038 1.495.026a14.713 14.713 0 0 1 1.506-.026c.075.752.162 1.395.162 1.398a1 1 0 0 0 .995.874h.003a1 1 0 0 0 .967-.935a13.905 13.905 0 0 0-1.066-5.282Z"
-                            />
-                          </svg>
-                        </span>
-                        <span>{location}</span>
-                      </div>
-                      {/* Example bottom tag, comment/uncomment as needed */}
-                      {/* <span className="ml-auto bg-orange-200 text-orange-800 px-2 py-1 rounded text-[11px] font-semibold">Ongoing Soon</span> */}
-                    </div>
-                    {/* Edit/Config Buttons Under Address Right Corner */}
-                    <div className="flex justify-end mt-1 pr-1">
-                      {canEdit(partnership) && (
-                        <div className="flex gap-1">
-                          {isAdmin ? (
-                            <>
-                              <button
-                                onClick={() => openEditModal(partnership)}
-                                className="p-1 text-blue-600 hover:bg-blue-50 rounded"
-                                title="Edit"
-                              >
-                                <Edit size={18} />
-                              </button>
-                              <DeleteAlertDialog
-                                onConfirm={() =>
-                                  deleteMutation.mutateAsync(partnership.id)
-                                }
-                              />
-                            </>
-                          ) : (
-                            <>
-                              <button
-                                onClick={() =>
-                                  openRequestModal("update", partnership)
-                                }
-                                className="p-1 text-blue-600 hover:bg-blue-50 rounded"
-                                title="Request Update"
-                              >
-                                <Edit size={18} />
-                              </button>
-                              <button
-                                onClick={() =>
-                                  openRequestModal("delete", partnership)
-                                }
-                                className="p-1 text-red-600 hover:bg-red-50 rounded"
-                                title="Request Delete"
-                              >
-                                <Trash2 size={18} />
-                              </button>
-                            </>
-                          )}
-                        </div>
+                            <Edit size={18} />
+                          </button>
+                          <DeleteAlertDialog
+                            onConfirm={() =>
+                              deleteMutation.mutateAsync(partnership.id)
+                            }
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() =>
+                              openRequestModal("update", partnership)
+                            }
+                            className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                            title="Request Update"
+                          >
+                            <Edit size={18} />
+                          </button>
+                          <button
+                            onClick={() =>
+                              openRequestModal("delete", partnership)
+                            }
+                            className="p-1 text-red-600 hover:bg-red-50 rounded"
+                            title="Request Delete"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </>
                       )}
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )
-      )}
-
-      {(!partnerships || partnerships.length === 0) && (
-        <p className="text-center py-8 text-slate-500">No partnerships found</p>
-      )}
-
+                  )}
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
       <Modal
         isOpen={detailModalOpen}
         onClose={() => setDetailModalOpen(false)}
@@ -675,9 +691,9 @@ export default function Partnerships() {
               required
             >
               <option value="active">Active</option>
-              <option value="canceled">Canceled</option>
-              <option value="renewal">Renewal</option>
+              <option value="renewal">For Renewal</option>
               <option value="expired">Expired</option>
+              <option value="terminated">Terminated</option>
             </select>
           </div>
 

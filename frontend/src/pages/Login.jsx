@@ -1,96 +1,82 @@
-import React from 'react';
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
-import '../styles/App.css';
+import { useAuth } from "../context/AuthProvider";
 
-const Login = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [rememberMe, setRememberMe] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+export default function Login() {
+  const [username, setUsername] = useState(""); // email by default
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-        try {
-            const res = await axios.post("http://localhost:8000/api/auth/login/", { email, password })
-            localStorage.setItem(ACCESS_TOKEN, res.data.access);
-            localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
-            navigate("/partnerships");
-        } catch (error) {
-            alert(error.response?.data || error.message)
-        } finally {
-            setLoading(false)
-        }
-    };
+    try {
+      const user = await login(username, password);
+      if (user.role === "admin") {
+        navigate("/dashboard");
+      } else {
+        navigate("/partnerships");
+      }
+    } catch (err) {
+      setError("Invalid username or password");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="auth-wrapper-new">
-      <div className="auth-header">
-        <img src="/hcdc-logo.png" alt="Holy Cross Logo" className="auth-header-logo" />
-        <h1 className="auth-header-title">HOLY CROSS OF<br/>DAVAO COLLEGE</h1>
-      </div>
-
-      <div className="auth-card-new">
-        <h2 className="auth-card-title">LOGIN</h2>
-
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-field">
-            <label>Email</label>
+    <div className="min-h-screen flex items-center justify-center bg-slate-100">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 className="text-2xl font-bold text-center mb-6">
+          School Partnership Management
+        </h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Username
+            </label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
-
-          <div className="form-field">
-            <label>Password</label>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Password
+            </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
-
-          <div className="form-options">
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-              />
-              <span>Remember Me</span>
-            </label>
-            <a href="#" className="forgot-password">Forgot Password?</a>
-          </div>
-
-          <button type="submit" className="btn-submit" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          >
+            {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
-
-        <div className="auth-footer">
-          Don't have an account?
-          <button
-            type="button"
-            className="link-button"
-            onClick={() => navigate('/register')}
-          >
-            Register
-          </button>
-        </div>
+        <p className="text-center mt-4 text-sm text-slate-500">
+          Default admin: adminosa / osa123
+        </p>
       </div>
     </div>
   );
-};
-
-export default Login;
+}

@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthProvider";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import LandingPage from "./pages/LandingPage";
+import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Departments from "./pages/Departments";
@@ -23,7 +25,7 @@ function App() {
 
   return (
     <Routes>
-      <Route
+      {/* <Route
         path="/login"
         element={
           isAuthenticated ? (
@@ -32,10 +34,12 @@ function App() {
             <Login />
           )
         }
-      />
+      /> */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
       <Route
-        path="/"
         element={
           <ProtectedRoute>
             <Layout />
@@ -87,7 +91,7 @@ function App() {
         />
       </Route>
 
-      <Route path="*" element={<Navigate to="/" />} />
+      <Route path="*" element={<Navigate to="/partnerships" />} />
     </Routes>
   );
 }
