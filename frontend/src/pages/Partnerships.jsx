@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   usePartnerships,
   useCreatePartnership,
@@ -13,15 +13,12 @@ import DeleteAlertDialog from "../components/DeleteAlertDialog";
 import { Plus, Edit, Trash2, Eye, Send } from "lucide-react";
 
 export default function Partnerships() {
-  const { user, isAdmin, isStaff } = useAuth();
-  const { data: partnerships, isLoading } = usePartnerships();
-  const { data: departments } = useDepartments();
-  const createMutation = useCreatePartnership();
-  const updateMutation = useUpdatePartnership();
-  const deleteMutation = useDeletePartnership();
-  const createRequestMutation = useCreateRequest();
-
   const [selectedDept, setSelectedDept] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [requestModalOpen, setRequestModalOpen] = useState(false);
@@ -29,6 +26,31 @@ export default function Partnerships() {
   const [editingPartnership, setEditingPartnership] = useState(null);
   const [requestType, setRequestType] = useState("create");
   const [requestMessage, setRequestMessage] = useState("");
+
+  const { user, isAdmin, isStaff } = useAuth();
+  const {
+    data: partnerships,
+    isLoading,
+    refetch,
+  } = usePartnerships({
+    departmentName: selectedDept,
+    search: searchQuery,
+    type: typeFilter,
+    status: statusFilter,
+    startDate,
+    endDate,
+    isAdmin,
+    isStaff,
+  });
+  const { data: departments } = useDepartments();
+  const createMutation = useCreatePartnership();
+  const updateMutation = useUpdatePartnership();
+  const deleteMutation = useDeletePartnership();
+  const createRequestMutation = useCreateRequest();
+
+  useEffect(() => {
+    refetch();
+  }, [selectedDept, searchQuery, typeFilter, statusFilter, startDate, endDate]);
 
   const [formData, setFormData] = useState({
     department: "",
@@ -158,7 +180,14 @@ export default function Partnerships() {
     return acc;
   }, {});
 
-  const departmentNames = ["All", ...Object.keys(groupedPartnerships || {})];
+  const departmentList = departments?.reduce((acc, p) => {
+    const deptName = p.name || "Unknown";
+    if (!acc[deptName]) acc[deptName] = [];
+    acc[deptName].push(p);
+    return acc;
+  }, {});
+
+  const departmentNames = ["All", ...Object.keys(departmentList || {})];
 
   const visiblePartnerships =
     selectedDept === "All"
@@ -191,21 +220,82 @@ export default function Partnerships() {
         </div>
       </div>
 
-      <div className="flex gap-3 mb-8 overflow-x-auto">
-        {departmentNames.map((dept) => (
-          <button
-            key={dept}
-            onClick={() => setSelectedDept(dept)}
-            className={`px-5 py-2 rounded-full text-sm font-semibold transition
-        ${
-          selectedDept === dept
-            ? "bg-blue-600 text-white shadow"
-            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-        }`}
+      <div className="relative -mx-4 px-4 mb-8">
+        <div
+          className="flex gap-3 overflow-x-auto whitespace-nowrap pb-2"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
+          {departmentNames.map((dept) => (
+            <button
+              key={dept}
+              onClick={() => setSelectedDept(dept)}
+              className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition
+          ${
+            selectedDept === dept
+              ? "bg-blue-600 text-white shadow"
+              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+          }`}
+            >
+              {dept}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-4 mb-6">
+        {/* Search - visible to all */}
+        <input
+          type="text"
+          placeholder="Search partnerships..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="px-4 py-2 border rounded w-full md:w-1/3"
+        />
+
+        {/* Type filter - visible to all */}
+        <select
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value)}
+          className="px-4 py-2 border rounded w-full md:w-1/4"
+        >
+          <option value="">All Types</option>
+          <option value="local">Local</option>
+          <option value="international">International</option>
+        </select>
+
+        {/* Status filter - staff/admin only */}
+        {(isAdmin || isStaff) && (
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-2 border rounded w-full md:w-1/4"
           >
-            {dept}
-          </button>
-        ))}
+            <option value="">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="renewal">For Renewal</option>
+            <option value="terminated">Terminated</option>
+            <option value="expired">Expired</option>
+          </select>
+        )}
+
+        {/* Time range filter - staff/admin only, depends on status */}
+        {(isAdmin || isStaff) && statusFilter && (
+          <div className="flex gap-2 w-full md:w-auto">
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="px-4 py-2 border rounded"
+            />
+            <span className="self-center">to</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="px-4 py-2 border rounded"
+            />
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

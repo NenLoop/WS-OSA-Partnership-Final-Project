@@ -1,7 +1,6 @@
 import api from "./axios";
 
-export const getPartnerships = async (departmentId) => {
-  const params = departmentId ? { department: departmentId } : {};
+export const getPartnerships = async (params = {}) => {
   const response = await api.get("/partnerships/", { params });
   return response.data;
 };

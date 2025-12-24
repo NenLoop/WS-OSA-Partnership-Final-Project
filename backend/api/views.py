@@ -1,6 +1,7 @@
 from django.utils import timezone
 from django.db.models import Count
 from rest_framework import viewsets, status, generics
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -18,6 +19,7 @@ from .permissions import (
     IsAdmin, IsAdminOrReadOnly, PartnershipPermission,
     RequestPermission, NotificationPermission
 )
+from .filters import PartnershipFilter
 
 User = get_user_model()
 
@@ -79,13 +81,26 @@ class UserViewSet(viewsets.ModelViewSet):
 class PartnershipViewSet(viewsets.ModelViewSet):
     queryset = Partnership.objects.all()
     serializer_class = PartnershipSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PartnershipFilter
     permission_classes = [PartnershipPermission]
 
     def get_queryset(self):
         queryset = Partnership.objects.all()
-        department_id = self.request.query_params.get('department', None)
-        if department_id:
-            queryset = queryset.filter(department_id=department_id)
+        status = self.request.query_params.get('status')
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
+
+        if status and (start_date or end_date):
+            if start_date:
+                queryset = queryset.filter(started_date__gte=start_date)
+            if end_date:
+                queryset = queryset.filter(started_date__lte=end_date)
+
+        # if department_id:
+        #     queryset = queryset.filter(department_id=department_id)
+        
+
         return queryset
 
     def perform_create(self, serializer):
