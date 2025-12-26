@@ -3,6 +3,8 @@ from django.db import models
 
 
 class Department(models.Model):
+    # acronym?
+    acronym = models.CharField(max_length=10, blank=True, null=True)
     name = models.CharField(max_length=255)
     logo = models.ImageField(upload_to='department-logo/', null=True, blank=True)
 

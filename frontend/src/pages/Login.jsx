@@ -74,7 +74,7 @@ export default function Login() {
           </button>
         </form>
         <p className="text-center mt-4 text-sm text-slate-500">
-          Default admin: adminosa / osa123
+          Default admin: osaadmin / osa1234
         </p>
       </div>
     </div>

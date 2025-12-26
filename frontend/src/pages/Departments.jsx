@@ -18,15 +18,23 @@ export default function Departments() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingDept, setEditingDept] = useState(null);
-  const [formData, setFormData] = useState({ name: "", description: "" });
+  const [formData, setFormData] = useState({
+    acronym: "",
+    name: "",
+    description: "",
+  });
 
   const openModal = (dept = null) => {
     if (dept) {
       setEditingDept(dept);
-      setFormData({ name: dept.name, description: dept.description });
+      setFormData({
+        acronym: dept.acronym,
+        name: dept.name,
+        description: dept.description,
+      });
     } else {
       setEditingDept(null);
-      setFormData({ name: "", description: "" });
+      setFormData({ acronym: "", name: "", description: "" });
     }
     setModalOpen(true);
   };
@@ -123,6 +131,18 @@ export default function Departments() {
         title={editingDept ? "Edit Department" : "Add Department"}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Acronym</label>
+            <input
+              type="text"
+              value={formData.acronym}
+              onChange={(e) =>
+                setFormData({ ...formData, acronym: e.target.value })
+              }
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
           <div>
             <label className="block text-sm font-medium mb-1">Name</label>
             <input

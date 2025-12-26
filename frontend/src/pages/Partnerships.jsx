@@ -182,12 +182,23 @@ export default function Partnerships() {
 
   const departmentList = departments?.reduce((acc, p) => {
     const deptName = p.name || "Unknown";
-    if (!acc[deptName]) acc[deptName] = [];
-    acc[deptName].push(p);
+    const deptAcronym = p.acronym || deptName;
+
+    if (!acc[deptName]) {
+      acc[deptName] = {
+        name: deptName,
+        acronym: deptAcronym,
+        partnerships: [],
+      };
+    }
+    acc[deptName].partnerships.push(p);
     return acc;
   }, {});
 
-  const departmentNames = ["All", ...Object.keys(departmentList || {})];
+  const departmentNames = [
+    { name: "All", acronym: "All" },
+    ...Object.values(departmentList || {}),
+  ];
 
   const visiblePartnerships =
     selectedDept === "All"
@@ -227,8 +238,8 @@ export default function Partnerships() {
         >
           {departmentNames.map((dept) => (
             <button
-              key={dept}
-              onClick={() => setSelectedDept(dept)}
+              key={dept.name}
+              onClick={() => setSelectedDept(dept.name)}
               className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition
           ${
             selectedDept === dept
@@ -236,7 +247,7 @@ export default function Partnerships() {
               : "bg-slate-100 text-slate-600 hover:bg-slate-200"
           }`}
             >
-              {dept}
+              {dept.acronym}
             </button>
           ))}
         </div>

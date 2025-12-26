@@ -18,28 +18,22 @@ export default function Sidebar() {
 
   const navItems = [];
 
-  if (isAdmin) {
-    navItems.push(
-      { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { path: "/users", label: "Users", icon: Users }
-    );
-  }
-
   navItems.push(
-    { path: "/departments", label: "Departments", icon: Building2 },
-    { path: "/partnerships", label: "Partnerships", icon: Handshake }
+    { path: "/partnerships", label: "Partnerships", icon: Handshake },
+    { path: "/departments", label: "Departments", icon: Building2 }
   );
 
-  if (isStaff || isAdmin) {
+  if (isStaff) {
     navItems.push({ path: "/requests", label: "Requests", icon: FileText });
   }
 
   if (isAdmin) {
-    navItems.push({
-      path: "/notifications",
-      label: "Notifications",
-      icon: Bell,
-    });
+    navItems.push(
+      { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { path: "/requests", label: "Requests", icon: FileText },
+      { path: "/users", label: "Users", icon: Users },
+      { path: "/notifications", label: "Notifications", icon: Bell }
+    );
   }
 
   return (

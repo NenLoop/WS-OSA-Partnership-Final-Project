@@ -11,7 +11,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Department
-        fields = ['id', 'name', 'description', 'partnership_count', 'staff_count', 'created_at', 'updated_at']
+        fields = ['id', 'acronym', 'name', 'description', 'partnership_count', 'staff_count', 'created_at', 'updated_at']
         read_only_fields = ['created_at', 'updated_at']
 
     def get_partnership_count(self, obj):
