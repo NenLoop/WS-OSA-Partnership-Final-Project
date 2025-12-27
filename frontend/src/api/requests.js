@@ -1,7 +1,11 @@
 import api from "./axios";
 
-export const getRequests = async () => {
-  const response = await api.get("/requests/");
+export const getRequests = async ({ page = 1 }) => {
+  const response = await api.get("/requests/", {
+    params: {
+      page,
+    },
+  });
   return response.data;
 };
 

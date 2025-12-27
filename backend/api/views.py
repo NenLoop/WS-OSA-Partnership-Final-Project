@@ -19,6 +19,7 @@ from .permissions import (
     IsAdmin, IsAdminOrReadOnly, PartnershipPermission,
     RequestPermission, NotificationPermission
 )
+from .pagination import StandardResultsSetPagination
 from .filters import PartnershipFilter
 
 User = get_user_model()
@@ -45,12 +46,14 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
     permission_classes = [IsAdminOrReadOnly]
+    pagination_class = StandardResultsSetPagination
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAdmin]
+    pagination_class = StandardResultsSetPagination
 
     @action(detail=False, methods=['post'])
     def assign_staff(self, request):
@@ -84,6 +87,7 @@ class PartnershipViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = PartnershipFilter
     permission_classes = [PartnershipPermission]
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         queryset = Partnership.objects.all()
@@ -135,6 +139,8 @@ class PartnershipRequestViewSet(viewsets.ModelViewSet):
     queryset = PartnershipRequest.objects.all()
     serializer_class = PartnershipRequestSerializer
     permission_classes = [RequestPermission]
+    pagination_class = StandardResultsSetPagination
+
 
     def get_queryset(self):
         user = self.request.user
@@ -217,6 +223,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
     permission_classes = [NotificationPermission]
+    pagination_class = StandardResultsSetPagination
 
     @action(detail=True, methods=['post'])
     def mark_seen(self, request, pk=None):

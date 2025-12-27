@@ -10,7 +10,8 @@ import { Check, X, Eye } from "lucide-react";
 
 export default function Requests() {
   const { isAdmin } = useAuth();
-  const { data: requests, isLoading } = useRequests();
+  const [page, setPage] = useState(1);
+  const { data: requests, isLoading } = useRequests(page);
   const approveMutation = useApproveRequest();
   const declineMutation = useDeclineRequest();
 
@@ -79,7 +80,7 @@ export default function Requests() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {requests?.map((request) => (
+            {requests?.results.map((request) => (
               <tr key={request.id} className="hover:bg-slate-50">
                 <td className="px-4 py-3">
                   <span
@@ -146,6 +147,29 @@ export default function Requests() {
             ))}
           </tbody>
         </table>
+
+        <div className="flex items-center justify-between mt-6">
+          <button
+            disabled={!requests?.previous}
+            onClick={() => setPage((p) => Math.max(p - 1, 1))}
+            className="px-4 py-2 rounded bg-gray-200 disabled:opacity-50"
+          >
+            Previous
+          </button>
+
+          <span className="text-sm text-gray-600">
+            Page {requests?.current_page} of {requests?.total_pages}
+          </span>
+
+          <button
+            disabled={!requests?.next}
+            onClick={() => setPage((p) => p + 1)}
+            className="px-4 py-2 rounded bg-gray-200 disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+
         {requests?.length === 0 && (
           <p className="text-center py-8 text-slate-500">No requests found</p>
         )}

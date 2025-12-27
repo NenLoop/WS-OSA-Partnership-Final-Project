@@ -11,7 +11,8 @@ import Modal from "../components/Modal";
 import { Plus, Edit, Trash2, UserCog } from "lucide-react";
 
 export default function Users() {
-  const { data: users, isLoading } = useUsers();
+  const [page, setPage] = useState(1);
+  const { data: users, isLoading } = useUsers(page);
   const { data: departments } = useDepartments();
   const createMutation = useCreateUser();
   const updateMutation = useUpdateUser();
@@ -137,7 +138,7 @@ export default function Users() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {users?.map((user) => (
+            {users?.results.map((user) => (
               <tr key={user.id} className="hover:bg-slate-50">
                 <td className="px-4 py-3 font-medium">{user.username}</td>
                 <td className="px-4 py-3 text-slate-600">
@@ -185,6 +186,29 @@ export default function Users() {
             ))}
           </tbody>
         </table>
+
+        <div className="flex items-center justify-between mt-6">
+          <button
+            disabled={!users?.previous}
+            onClick={() => setPage((p) => Math.max(p - 1, 1))}
+            className="px-4 py-2 rounded bg-gray-200 disabled:opacity-50"
+          >
+            Previous
+          </button>
+
+          <span className="text-sm text-gray-600">
+            Page {users?.current_page} of {users?.total_pages}
+          </span>
+
+          <button
+            disabled={!users?.next}
+            onClick={() => setPage((p) => p + 1)}
+            className="px-4 py-2 rounded bg-gray-200 disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+
         {users?.length === 0 && (
           <p className="text-center py-8 text-slate-500">No users found</p>
         )}
@@ -288,7 +312,7 @@ export default function Users() {
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">No Department</option>
-                {departments?.map((dept) => (
+                {departments?.results.map((dept) => (
                   <option key={dept.id} value={dept.id}>
                     {dept.name}
                   </option>
@@ -349,7 +373,7 @@ export default function Users() {
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">No Department</option>
-              {departments?.map((dept) => (
+              {departments?.results.map((dept) => (
                 <option key={dept.id} value={dept.id}>
                   {dept.name}
                 </option>

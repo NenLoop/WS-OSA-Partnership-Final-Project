@@ -12,6 +12,7 @@ export function usePartnerships({
   endDate = "",
   isAdmin = false,
   isStaff = false,
+  page = 1,
 }) {
   // Build query params depending on role
 
@@ -33,6 +34,8 @@ export function usePartnerships({
 
       end_date:
         isAdmin || (isStaff && status) ? endDate || undefined : undefined,
+
+      page,
     }),
     [
       departmentName,
@@ -43,6 +46,7 @@ export function usePartnerships({
       endDate,
       isAdmin,
       isStaff,
+      page,
     ]
   );
 

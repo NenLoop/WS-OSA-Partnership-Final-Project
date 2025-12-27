@@ -1,7 +1,11 @@
 import api from "./axios";
 
-export const getNotifications = async () => {
-  const response = await api.get("/notifications/");
+export const getNotifications = async ({ page = 1 }) => {
+  const response = await api.get("/notifications/", {
+    params: {
+      page,
+    },
+  });
   return response.data;
 };
 

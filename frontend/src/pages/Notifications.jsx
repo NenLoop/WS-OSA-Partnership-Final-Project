@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   useNotifications,
   useMarkSeen,
@@ -6,7 +7,8 @@ import {
 import { Bell, Check, CheckCheck } from "lucide-react";
 
 export default function Notifications() {
-  const { data: notifications, isLoading } = useNotifications();
+  const [page, setPage] = useState(1);
+  const { data: notifications, isLoading } = useNotifications(page);
   const markSeenMutation = useMarkSeen();
   const markAllSeenMutation = useMarkAllSeen();
 
@@ -28,7 +30,7 @@ export default function Notifications() {
   };
 
   const unseenCount =
-    notifications?.filter((n) => n.status === "unseen").length || 0;
+    notifications?.results.filter((n) => n.status === "unseen").length || 0;
 
   if (isLoading) {
     return <div className="text-center py-8">Loading...</div>;
@@ -57,7 +59,7 @@ export default function Notifications() {
       </div>
 
       <div className="space-y-3">
-        {notifications?.map((notification) => (
+        {notifications?.results.map((notification) => (
           <div
             key={notification.id}
             className={`bg-white rounded-lg shadow p-4 flex items-start gap-4 ${
@@ -101,6 +103,28 @@ export default function Notifications() {
             </div>
           </div>
         ))}
+
+        <div className="flex items-center justify-between mt-6">
+          <button
+            disabled={!notifications?.previous}
+            onClick={() => setPage((p) => Math.max(p - 1, 1))}
+            className="px-4 py-2 rounded bg-gray-200 disabled:opacity-50"
+          >
+            Previous
+          </button>
+
+          <span className="text-sm text-gray-600">
+            Page {notifications?.current_page} of {notifications?.total_pages}
+          </span>
+
+          <button
+            disabled={!notifications?.next}
+            onClick={() => setPage((p) => p + 1)}
+            className="px-4 py-2 rounded bg-gray-200 disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
 
         {notifications?.length === 0 && (
           <div className="text-center py-12 text-slate-500">

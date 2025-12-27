@@ -11,7 +11,8 @@ import { Plus, Edit, Trash2 } from "lucide-react";
 
 export default function Departments() {
   const { isAdmin } = useAuth();
-  const { data: departments, isLoading } = useDepartments();
+  const [page, setPage] = useState(1);
+  const { data: departments, isLoading } = useDepartments(page);
   const createMutation = useCreateDepartment();
   const updateMutation = useUpdateDepartment();
   const deleteMutation = useDeleteDepartment();
@@ -73,7 +74,6 @@ export default function Departments() {
           </button>
         )}
       </div>
-
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <table className="w-full">
           <thead className="bg-slate-50">
@@ -88,7 +88,7 @@ export default function Departments() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {departments?.map((dept) => (
+            {departments?.results.map((dept) => (
               <tr key={dept.id} className="hover:bg-slate-50">
                 <td className="px-4 py-3 font-medium">{dept.name}</td>
                 <td className="px-4 py-3 text-slate-600">
@@ -118,7 +118,29 @@ export default function Departments() {
             ))}
           </tbody>
         </table>
-        {departments?.length === 0 && (
+        <div className="flex items-center justify-between mt-6">
+          <button
+            disabled={!departments?.previous}
+            onClick={() => setPage((p) => Math.max(p - 1, 1))}
+            className="px-4 py-2 rounded bg-gray-200 disabled:opacity-50"
+          >
+            Previous
+          </button>
+
+          <span className="text-sm text-gray-600">
+            Page {departments?.current_page} of {departments?.total_pages}
+          </span>
+
+          <button
+            disabled={!departments?.next}
+            onClick={() => setPage((p) => p + 1)}
+            className="px-4 py-2 rounded bg-gray-200 disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+
+        {departments?.results.length === 0 && (
           <p className="text-center py-8 text-slate-500">
             No departments found
           </p>

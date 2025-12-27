@@ -19,6 +19,7 @@ export default function Partnerships() {
   const [statusFilter, setStatusFilter] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [page, setPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [requestModalOpen, setRequestModalOpen] = useState(false);
@@ -41,6 +42,7 @@ export default function Partnerships() {
     endDate,
     isAdmin,
     isStaff,
+    page,
   });
   const { data: departments } = useDepartments();
   const createMutation = useCreatePartnership();
@@ -169,14 +171,7 @@ export default function Partnerships() {
     setRequestModalOpen(false);
   };
 
-  const groupedPartnerships = partnerships?.reduce((acc, p) => {
-    const deptName = p.department_name || "Unknown";
-    if (!acc[deptName]) acc[deptName] = [];
-    acc[deptName].push(p);
-    return acc;
-  }, {});
-
-  const departmentList = departments?.reduce((acc, p) => {
+  const departmentList = departments?.results.reduce((acc, p) => {
     const deptName = p.name || "Unknown";
     const deptAcronym = p.acronym || deptName;
 
@@ -198,8 +193,8 @@ export default function Partnerships() {
 
   const visiblePartnerships =
     selectedDept === "All"
-      ? partnerships
-      : groupedPartnerships?.[selectedDept] || [];
+      ? partnerships?.results || []
+      : departmentList?.[selectedDept]?.partnerships || [];
 
   return (
     <div>
@@ -521,6 +516,28 @@ export default function Partnerships() {
           </div>
         </div>
       )}
+
+      <div className="flex items-center justify-between mt-6">
+        <button
+          disabled={!partnerships?.previous}
+          onClick={() => setPage((p) => Math.max(p - 1, 1))}
+          className="px-4 py-2 rounded bg-gray-200 disabled:opacity-50"
+        >
+          Previous
+        </button>
+
+        <span className="text-sm text-gray-600">
+          Page {partnerships?.current_page} of {partnerships?.total_pages}
+        </span>
+
+        <button
+          disabled={!partnerships?.next}
+          onClick={() => setPage((p) => p + 1)}
+          className="px-4 py-2 rounded bg-gray-200 disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
       <Modal
         isOpen={detailModalOpen}
         onClose={() => setDetailModalOpen(false)}
@@ -586,7 +603,7 @@ export default function Partnerships() {
               disabled={isStaff}
             >
               <option value="">Select Department</option>
-              {departments?.map((dept) => (
+              {departments?.results.map((dept) => (
                 <option key={dept.id} value={dept.id}>
                   {dept.name}
                 </option>
@@ -842,7 +859,7 @@ export default function Partnerships() {
                   disabled={isStaff}
                 >
                   <option value="">Select Department</option>
-                  {departments?.map((dept) => (
+                  {departments?.results.map((dept) => (
                     <option key={dept.id} value={dept.id}>
                       {dept.name}
                     </option>

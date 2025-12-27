@@ -1,10 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as departmentsApi from "../api/departments";
 
-export function useDepartments() {
+export function useDepartments(page) {
   return useQuery({
-    queryKey: ["departments"],
-    queryFn: departmentsApi.getDepartments,
+    queryKey: ["departments", page],
+    queryFn: ({ queryKey }) => {
+      const [, page] = queryKey;
+      return departmentsApi.getDepartments({ page });
+    },
+    keepPreviousData: true,
   });
 }
 
