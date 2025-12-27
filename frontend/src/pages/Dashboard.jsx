@@ -73,9 +73,14 @@ export default function Dashboard() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.partnerships_by_department}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
+                <XAxis dataKey="acronym" />
                 <YAxis allowDecimals={false} />
-                <Tooltip />
+                <Tooltip
+                  formatter={(value) => [value, "Partnerships"]}
+                  labelFormatter={(label, payload) =>
+                    payload?.[0]?.payload?.name || label
+                  }
+                />
                 <Bar dataKey="count" fill="#3b82f6" name="Partnerships" />
               </BarChart>
             </ResponsiveContainer>

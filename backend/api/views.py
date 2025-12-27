@@ -237,7 +237,7 @@ class DashboardStatsView(APIView):
     def get(self, request):
         partnerships_by_dept = Department.objects.annotate(
             count=Count('partnerships')
-        ).values('name', 'count')
+        ).values('name', 'acronym', 'count')
         
         stats = {
             'total_users': User.objects.count(),
