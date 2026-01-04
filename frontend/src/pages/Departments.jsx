@@ -7,7 +7,8 @@ import {
 } from "../hooks/useDepartments";
 import { useAuth } from "../context/AuthProvider";
 import Modal from "../components/Modal";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit } from "lucide-react";
+import DeleteAlertDialog from "../components/DeleteAlertDialog";
 
 export default function Departments() {
   const { isAdmin } = useAuth();
@@ -51,9 +52,7 @@ export default function Departments() {
   };
 
   const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this department?")) {
-      await deleteMutation.mutateAsync(id);
-    }
+    await deleteMutation.mutateAsync(id);
   };
 
   if (isLoading) {
@@ -105,12 +104,13 @@ export default function Departments() {
                       >
                         <Edit size={18} />
                       </button>
-                      <button
-                        onClick={() => handleDelete(dept.id)}
-                        className="p-1 text-red-600 hover:bg-red-50 rounded"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                      <DeleteAlertDialog
+                        onConfirm={() => () => handleDelete(dept.id)}
+                        title={"Delete Department"}
+                        message={
+                          "Are you sure you want to delete this department? This action cannot be undone."
+                        }
+                      />
                     </div>
                   </td>
                 )}

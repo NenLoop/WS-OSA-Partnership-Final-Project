@@ -8,7 +8,8 @@ import {
 } from "../hooks/useUsers";
 import { useDepartments } from "../hooks/useDepartments";
 import Modal from "../components/Modal";
-import { Plus, Edit, Trash2, UserCog } from "lucide-react";
+import { Plus, Edit, UserCog } from "lucide-react";
+import DeleteAlertDialog from "../components/DeleteAlertDialog";
 
 export default function Users() {
   const [page, setPage] = useState(1);
@@ -174,12 +175,13 @@ export default function Users() {
                     >
                       <Edit size={18} />
                     </button>
-                    <button
-                      onClick={() => handleDelete(user.id)}
-                      className="p-1 text-red-600 hover:bg-red-50 rounded"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    <DeleteAlertDialog
+                      onConfirm={() => () => handleDelete(user.id)}
+                      title={"Delete User"}
+                      message={
+                        "Are you sure you want to delete this user? This action cannot be undone."
+                      }
+                    />
                   </div>
                 </td>
               </tr>

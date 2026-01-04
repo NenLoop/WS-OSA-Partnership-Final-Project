@@ -25,7 +25,7 @@ function App() {
 
   return (
     <Routes>
-      {/* <Route
+      <Route
         path="/login"
         element={
           isAuthenticated ? (
@@ -34,9 +34,7 @@ function App() {
             <Login />
           )
         }
-      /> */}
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<Login />} />
+      />
       <Route path="/register" element={<Register />} />
 
       <Route

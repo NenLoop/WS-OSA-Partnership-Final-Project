@@ -191,11 +191,6 @@ export default function Partnerships() {
     ...Object.values(departmentList || {}),
   ];
 
-  const visiblePartnerships =
-    selectedDept === "All"
-      ? partnerships?.results || []
-      : departmentList?.[selectedDept]?.partnerships || [];
-
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -304,12 +299,12 @@ export default function Partnerships() {
       ) : (
         <div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {visiblePartnerships.length === 0 ? (
+            {partnerships?.results.length === 0 ? (
               <p className="col-span-full text-center py-10 text-slate-500">
                 No partnerships found
               </p>
             ) : (
-              visiblePartnerships.map((partnership) => {
+              partnerships?.results.map((partnership) => {
                 const now = new Date();
                 const started = partnership.started_date
                   ? new Date(partnership.started_date)
@@ -481,6 +476,10 @@ export default function Partnerships() {
                               <DeleteAlertDialog
                                 onConfirm={() =>
                                   deleteMutation.mutateAsync(partnership.id)
+                                }
+                                title={"Delete Partnership"}
+                                message={
+                                  "Are you sure you want to delete this partnership? This action cannot be undone."
                                 }
                               />
                             </>

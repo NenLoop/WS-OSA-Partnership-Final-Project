@@ -33,6 +33,7 @@ class Department(models.Model):
 
 
 class User(AbstractUser):
+    email = models.EmailField(unique=True)
     ROLE_CHOICES = [
         ('viewer', 'Viewer'),
         ('staff', 'Department Staff'),
@@ -46,6 +47,9 @@ class User(AbstractUser):
         blank=True,
         related_name='staff_members'
     )
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
 
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"

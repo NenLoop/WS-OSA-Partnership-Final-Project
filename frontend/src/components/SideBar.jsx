@@ -12,6 +12,7 @@ import {
   MoveLeft,
   UserCog,
 } from "lucide-react";
+import LogOutAlertDialog from "./LogOutAlertDialog";
 
 export default function Sidebar({ open, setOpen }) {
   const { user, logout, isAdmin, isStaff } = useAuth();
@@ -101,15 +102,7 @@ export default function Sidebar({ open, setOpen }) {
         </div>
 
         <div className="border-t border-slate-700">
-          <button
-            onClick={logout}
-            className="flex items-center gap-3 px-3 py-2 text-slate-300 hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            <LogOut size={20} />
-            <p className={`text-sm duration-300 ${!open && "hidden"}`}>
-              Logout
-            </p>
-          </button>
+          <LogOutAlertDialog onLogout={logout} />
         </div>
       </div>
     </div>

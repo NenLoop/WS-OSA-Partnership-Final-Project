@@ -1,5 +1,9 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { login as apiLogin, getProfile } from "../api/auth";
+import {
+  login as apiLogin,
+  register as apiRegister,
+  getProfile,
+} from "../api/auth";
 
 const AuthContext = createContext(null);
 
@@ -8,6 +12,7 @@ export function AuthProvider({ children }) {
     const saved = localStorage.getItem("user");
     return saved ? JSON.parse(saved) : null;
   });
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,13 +34,18 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const login = async (username, password) => {
-    const data = await apiLogin(username, password);
+  const login = async (email, password) => {
+    const data = await apiLogin(email, password);
     localStorage.setItem("access_token", data.access);
     localStorage.setItem("refresh_token", data.refresh);
     localStorage.setItem("user", JSON.stringify(data.user));
     setUser(data.user);
     return data.user;
+  };
+
+  const register = async (userData) => {
+    const createdUser = await apiRegister(userData);
+    return createdUser;
   };
 
   const logout = () => {
@@ -48,6 +58,7 @@ export function AuthProvider({ children }) {
   const value = {
     user,
     login,
+    register,
     logout,
     loading,
     isAuthenticated: !!user,

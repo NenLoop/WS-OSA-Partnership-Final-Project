@@ -1,16 +1,14 @@
 import { AlertDialog } from "radix-ui";
-import { Trash2 } from "lucide-react";
+import { Trash2, LogOut } from "lucide-react";
 
-export default function DeleteAlertDialog({ onConfirm, title, message }) {
+export default function LogOutAlertDialog({ onLogout }) {
   return (
     <AlertDialog.Root>
       {/* Trigger */}
       <AlertDialog.Trigger asChild>
-        <button
-          className="p-1 text-red-600 hover:bg-red-50 rounded"
-          title="Delete"
-        >
-          <Trash2 size={18} />
+        <button className="flex items-center gap-3 px-3 py-2 text-slate-300 hover:bg-slate-700 rounded-lg transition-colors">
+          <LogOut size={20} />
+          <p className={`text-sm duration-300 ${!open && "hidden"}`}>Logout</p>
         </button>
       </AlertDialog.Trigger>
 
@@ -27,11 +25,11 @@ export default function DeleteAlertDialog({ onConfirm, title, message }) {
           "
         >
           <AlertDialog.Title className="text-lg font-semibold">
-            {title}
+            Log Out Account
           </AlertDialog.Title>
 
           <AlertDialog.Description className="mt-2 text-sm text-gray-600">
-            {message}
+            Are you sure you want to log out
           </AlertDialog.Description>
 
           <div className="flex justify-end gap-2 mt-6">
@@ -43,10 +41,10 @@ export default function DeleteAlertDialog({ onConfirm, title, message }) {
 
             <AlertDialog.Action asChild>
               <button
-                onClick={onConfirm}
+                onClick={onLogout}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
               >
-                Delete
+                LogOut
               </button>
             </AlertDialog.Action>
           </div>
